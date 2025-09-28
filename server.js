@@ -4,17 +4,19 @@ const bcrypt = require("bcrypt");
 const cors = require("cors");
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;  // Render port lega
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// ✅ Connect MongoDB (local database)
-mongoose.connect("mongodb://127.0.0.1:27017/phoenixDB", {
+// ✅ Connect MongoDB (Atlas URI from Render env variables)
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
+})
+.then(() => console.log("✅ MongoDB connected successfully"))
+.catch(err => console.error("❌ MongoDB connection error:", err));
 
 // ✅ User Schema
 const userSchema = new mongoose.Schema({
@@ -66,4 +68,4 @@ app.post("/login", async (req, res) => {
 });
 
 // ✅ Start Server
-app.listen(PORT, () => console.log(`🚀 Backend running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));
