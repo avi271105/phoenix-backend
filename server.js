@@ -6,23 +6,24 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
+
+// ✅ Middleware
+app.use(cors({
+  origin: "https://phoenix-frontend.netlify.app", // frontend ka URL
+  methods: ["GET", "POST"],
+  credentials: true
+}));
+app.use(express.json());
+
 // ✅ Root Route (for testing)
 app.get("/", (req, res) => {
   res.send("🚀 Backend running successfully!");
 });
 
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// ✅ Connect MongoDB
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("✅ MongoDB connected successfully"))
-.catch(err => console.error("❌ MongoDB connection error:", err));
+// ✅ Connect MongoDB (⚡ updated - removed deprecated options)
+mongoose.connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected successfully"))
+  .catch(err => console.error("❌ MongoDB connection error:", err));
 
 // ✅ User Schema
 const userSchema = new mongoose.Schema({
@@ -48,7 +49,7 @@ app.post("/signup", async (req, res) => {
 
     res.json({ success: true, message: "Signup successful! Please login." });
   } catch (err) {
-    console.error(err);
+    console.error("❌ Signup error:", err);
     res.json({ success: false, message: "Error during signup." });
   }
 });
@@ -66,7 +67,7 @@ app.post("/login", async (req, res) => {
 
     res.json({ success: true, message: "Login successful!" });
   } catch (err) {
-    console.error(err);
+    console.error("❌ Login error:", err);
     res.json({ success: false, message: "Error during login." });
   }
 });
